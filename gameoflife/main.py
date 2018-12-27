@@ -9,9 +9,12 @@ class GameOfLife():
     def __getitem__(self, key):
         return self.matrix.__getitem__(key)
 
+    def pad_matrix(self):
+        return np.pad(self.matrix, (1,1), 'constant', constant_values=(0,))
+
     def neighbour_count(self, x, y):
         count = 0
-        matrix = np.pad(self.matrix, (1,1), 'constant', constant_values=(0,))
+        matrix = self.pad_matrix()
         for i in range(3):
             for j in range(3):
                 if i == 1 and j == 1: continue
@@ -37,4 +40,3 @@ class GameOfLife():
                 matrix[i,j] = self.step_cell(i, j)
 
         self.matrix = matrix
-
