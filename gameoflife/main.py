@@ -2,7 +2,7 @@ import numpy as np
 
 class GameOfLife():
     def __init__(self, matrix=[], shape=None):
-        self.matrix = np.array(matrix)
+        self.matrix = np.array(matrix, dtype=np.int32)
         if shape:
             self.matrix = self.matrix.reshape(shape)
 

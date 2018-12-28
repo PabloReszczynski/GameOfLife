@@ -1,12 +1,18 @@
-__device__ int neighbour_count(int *board, int x, int y) {
+__device__ int neighbour_count(int *board, int idx) {
   int count = 0;
-  for (int i = 0; i < 3; i++) {
-    for (int j = 0; j < 3; j++) {
-      count += board[x + i + y + j];
+  for (int i = -1; i <= 1; i++) {
+    for (int j = -1; j <= 1; j++) {
+      int newIdx = idx + i + (j * ($MATRIX_WIDTH + 2));
+      count += board[newIdx];
     }
   }
-  count -= board[x + y];
+  count -= board[idx];
   return count;
+}
+
+// Just for testing
+__global__ void neighbour_count_test(int *out, int *board, int idx) {
+  *out = neighbour_count(board, idx);
 }
 
 __device__ int step_cell(int cell, int neighbours) {
@@ -21,9 +27,10 @@ __device__ int step_cell(int cell, int neighbours) {
 }
 
 __global__ void step(int *board_in, int *board_out) {
-  int x = threadIdx.x + blockDim.x * gridDim.x;
-  int y = threadIdx.y + blockDim.y * gridDim.y;
-  int neighbours = neighbour_count(board_in, x, y);
-  int cell = board_in[x + y];
-  board_out[x + y] = step_cell(cell, neighbours);
+  int x = (threadIdx.x + 1); //+ gridDim.x;
+  int y = (threadIdx.y + 1) * ($MATRIX_WIDTH + 2);
+  int idx = x + y;
+  int neighbours = neighbour_count(board_in, idx);
+  int cell = board_in[idx];
+  board_out[idx] = step_cell(cell, neighbours);
 }
